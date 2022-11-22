@@ -2,18 +2,17 @@ const mongoose = require('mongoose');
 
 
 const express = require('express');
-const postRoute = require('./routes/post.route')
-// const editPostCaption = require('./routes/post.route');
-// const getPostById = require('./routes/post.route');
+const postRoute = require('./routes/post.route');
+const profileRoute = require('./routes/profile.route')
 
 
 
 const app = express();
 app.use(express.json())
 
-app.use('/post', postRoute )
-// app.use('/:id', editPostCaption )
-// app.use('/:id', getPostById )
+app.use('/post', postRoute );
+app.use('/profile', profileRoute);
+
 
 mongoose.connect('mongodb://localhost:27017/gram')
  .then(()=> console.log('connected to mongodb'))
