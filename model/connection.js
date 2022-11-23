@@ -2,14 +2,15 @@ const mongoose = require('mongoose');
 
 const connectionSchema = new mongoose.Schema({
     followee: {
-        type: mongoose.Types.ObjectId,
+        type: String,
         required: true,
 
     },
     follower: {
-        type: mongoose.Types.ObjectId,
+        type: String,
         required: true
     }
+
 });
 
 module.exports = mongoose.model('Connection', connectionSchema);

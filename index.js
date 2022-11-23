@@ -1,11 +1,9 @@
 const mongoose = require('mongoose');
 
-
 const express = require('express');
 const postRoute = require('./routes/post.route');
 const profileRoute = require('./routes/profile.route');
 const connectionRoute = require('./routes/connection.route')
-
 
 
 const app = express();
@@ -13,7 +11,7 @@ app.use(express.json())
 
 app.use('/post', postRoute );
 app.use('/profile', profileRoute);
-app.use('./connection', connectionRoute)
+app.use('/connection', connectionRoute);
 
 
 mongoose.connect('mongodb://localhost:27017/gram')

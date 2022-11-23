@@ -3,7 +3,7 @@ const { getAllFollowers, getAllFollowing } = require('../controllers/connection.
 
 const router = Router();
 
-router.get('/', getAllFollowers); 
-router.get('/', getAllFollowing); 
+router.get('/followers/:username', getAllFollowers); 
+router.get('/following/:username', getAllFollowing); 
 
 module.exports = router;
