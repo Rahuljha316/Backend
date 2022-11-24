@@ -1,4 +1,6 @@
 const Profile = require('../model/profile');
+const bcrypt = require('bcrypt');
+
 
 
 const  checkDuplicateUsername = async (username) => {
@@ -23,46 +25,61 @@ const  checkDuplicateEmail = async (email) => {
 // const checkPassword = ()
 
 const Register = async (req,res) => {
-    const { name, username, email, password, active, profileImage, bio } = req.body;
 
-    const duplicateUsername = await checkDuplicateUsername(username);
+    try{
+        const { name, username, email, password, active, profileImage, bio } = req.body;
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        const duplicateUsername = await checkDuplicateUsername(username);
     
-    if(duplicateUsername){
-        return res.status(403).send('username already exists')
+        if(duplicateUsername){
+            return res.status(403).send('username already exists')
+        }
+
+        const duplicateEmail = await checkDuplicateEmail(email);
+
+        if(duplicateEmail) {
+            return res.status(403).send('email already exists')
+        }
+
+        const user = new Profile({ name, username, email,password: hashedPassword, active, profileImage, bio });
+
+        const newUser = await user.save();
+        //send jwt token
+
+        res.status(200).send()
+       
     }
+    catch{
 
-    const duplicateEmail = await checkDuplicateEmail(email);
-
-    if(duplicateEmail) {
-        return res.status(403).send('email already exists')
+        res.status(500).send()
     }
-
-    const user = new Profile({ name, username, email, password, active, profileImage, bio });
-
-    const newUser = await user.save();
-    //send jwt token
-
-    res.status(200).send()
-
+   
 };
 
 const signIn = async(req,res) => {
-    const { name,username,email, password, active, profileImage, bio } = req.body;
+    
+    const { username,email, password } = req.body;
 
     const user= await Profile.findOne({ $or :[{username: username}, {email: email}]});
-
+    
     if(!user) {
         return res.status(404).send({message: 'user is not found'})
     }
 
-    // console.log(user[0].password);
-
-    if(user.password !== password){
+    try{
+        const compare =  await bcrypt.compare(password , user.password)
+        if (compare ){
+            return res.status(200).send({message: `logged in as ${user.username}`})
+        }
+        
         return res.status(401).send({message: "password is incorrect "})
-    }
 
-    res.status(200).send({message: `logged in as ${username}`})
-    
+    }
+    catch{
+        res.status(500).send()
+    }
 
 
 }
@@ -88,14 +105,6 @@ const searchUserByUsername = async (req,res) => {
     res.send(searchedUser)
 
 }
-
-
-
-
-
-
-
-
 
 
 const editUserDetails = async (req,res) => {

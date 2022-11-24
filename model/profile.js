@@ -17,6 +17,7 @@ const profileSchema = new mongoose.Schema({
     },  
     password:{
         type: String,
+        select:true     
 
     },
     active:{
