@@ -1,7 +1,6 @@
 const Profile = require('../model/profile');
 const bcrypt = require('bcrypt');
-
-
+const jwt = require('jsonwebtoken');
 
 const  checkDuplicateUsername = async (username) => {
 
@@ -22,7 +21,18 @@ const  checkDuplicateEmail = async (email) => {
       
 }
 
-// const checkPassword = ()
+function generateAuthToken(username,email){
+    const token = jwt.sign(
+
+        { username, email },
+        process.env.ACCESS_TOKEN_SECRET,
+        // {
+        //   expiresIn: "2h",
+        // }
+      );    
+      return token;
+}
+
 
 const Register = async (req,res) => {
 
@@ -45,10 +55,15 @@ const Register = async (req,res) => {
 
         const user = new Profile({ name, username, email,password: hashedPassword, active, profileImage, bio });
 
+
+        const token = generateAuthToken(user.username,user.email)
+
+
         const newUser = await user.save();
         //send jwt token
 
-        res.status(200).send()
+
+        res.status(200).send({token})
        
     }
     catch{
@@ -71,7 +86,11 @@ const signIn = async(req,res) => {
     try{
         const compare =  await bcrypt.compare(password , user.password)
         if (compare ){
-            return res.status(200).send({message: `logged in as ${user.username}`})
+
+
+            const token = generateAuthToken(user.username, user.email)
+
+            return res.status(200).send({token})
         }
         
         return res.status(401).send({message: "password is incorrect "})
@@ -130,8 +149,4 @@ module.exports = {
     searchUserByUsername,
 
 }
-
-
-
-
 

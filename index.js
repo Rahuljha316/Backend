@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+require('dotenv').config()
 
 const express = require('express');
 const postRoute = require('./routes/post.route');
