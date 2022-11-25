@@ -20,6 +20,9 @@ const profileSchema = new mongoose.Schema({
         select:true     
 
     },
+    confirmPassword: {
+        type: String
+    },
     active:{
         type: Boolean,
         default:true

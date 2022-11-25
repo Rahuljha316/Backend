@@ -1,6 +1,32 @@
 const Profile = require('../model/profile');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Joi = require('@hapi/joi');
+
+const registerSchema = Joi.object({
+    name:Joi.string().min(3).required(),
+    username:Joi.string().min(3).required(),
+    email:Joi.string().min(3).required().email().lowercase(),
+    password: Joi.string().min(3).required(),
+    // confimPassword: Joi.string().valid(Joi.ref('password')).required()
+    
+});
+
+const loginSchema = Joi.object({
+    // name:Joi.string().min(3).required(),
+    username:Joi.string().min(3).required(),
+    email:Joi.string().min(3).required().email(),
+    password: Joi.string().min(3).required(),
+    
+})
+
+const editDetailSchema = Joi.object({
+    name: Joi.string().min(3).optional(),
+    username: Joi.string().min(3).optional(),
+    profileImage: Joi.string().min(3).optional(),
+    bio: Joi.string().min(3).optional(),
+
+})
 
 const  checkDuplicateUsername = async (username) => {
 
@@ -37,6 +63,10 @@ function generateAuthToken(username,email){
 const Register = async (req,res) => {
 
     try{
+        const { error } = await registerSchema.validate(req.body)
+
+        if(error) return res.send({error})
+
         const { name, username, email, password, active, profileImage, bio } = req.body;
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -74,6 +104,10 @@ const Register = async (req,res) => {
 };
 
 const signIn = async(req,res) => {
+
+    const {error} = await loginSchema.validate(req.body)
+    
+    if(error) return res.send({error})
     
     const { username,email, password } = req.body;
 
@@ -127,6 +161,12 @@ const searchUserByUsername = async (req,res) => {
 
 
 const editUserDetails = async (req,res) => {
+
+   
+
+    const {error} = await editDetailSchema.validate(req.body);
+
+    if(error) return res.send({error})
 
     const { name,username, profileImage, bio } = req.body;
     const { id } = req.params;
