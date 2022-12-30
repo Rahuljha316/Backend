@@ -4,11 +4,14 @@ require('dotenv').config()
 const express = require('express');
 const postRoute = require('./routes/post.route');
 const profileRoute = require('./routes/profile.route');
-const connectionRoute = require('./routes/connection.route')
+const connectionRoute = require('./routes/connection.route');
+const cors = require('cors')
 
 
 const app = express();
-app.use(express.json())
+app.use(express.json());
+
+app.use(cors())
 
 app.use('/post', postRoute );
 app.use('/profile', profileRoute);

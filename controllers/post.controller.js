@@ -21,7 +21,8 @@ const editCaptionSchema = Joi.object({
 const addPost =  async(req,res) => {
     
     const {error} = await addPostSchema.validate(req.body)
-    if(error) return res.send({ error })
+    if(error) return res.status(400).send({error})
+
 
 
     const {createdBy, caption, location, hashtag, image } = req.body
@@ -35,7 +36,8 @@ const addPost =  async(req,res) => {
 const editPostCaption =  async(req,res) => {
 
     const {error}= await editCaptionSchema.validate(req.body)
-    if(error) return res.send({error})
+    if(error) return res.status(400).send({error})
+
 
     const {caption} = req.body;
     const { id }= req.params;

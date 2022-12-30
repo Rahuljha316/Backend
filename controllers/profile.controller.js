@@ -14,9 +14,9 @@ const registerSchema = Joi.object({
 
 const loginSchema = Joi.object({
     // name:Joi.string().min(3).required(),
-    username:Joi.string().min(3).required(),
-    email:Joi.string().min(3).required().email(),
-    password: Joi.string().min(3).required(),
+    // username:Joi.string().min(3),
+    email:Joi.string().min(3),
+    password: Joi.string().min(3),
     
 })
 
@@ -65,7 +65,7 @@ const Register = async (req,res) => {
     try{
         const { error } = await registerSchema.validate(req.body)
 
-        if(error) return res.send({error})
+        if(error) return res.status(400).send({error})
 
         const { name, username, email, password, active, profileImage, bio } = req.body;
 
@@ -107,20 +107,22 @@ const signIn = async(req,res) => {
 
     const {error} = await loginSchema.validate(req.body)
     
-    if(error) return res.send({error})
+    if(error) return res.status(400).send({error})
     
-    const { username,email, password } = req.body;
+    const { email, password } = req.body;
 
-    const user= await Profile.findOne({ $or :[{username: username}, {email: email}]});
+    const user= await Profile.findOne({ $or :[{username: email}, {email: email}]});
     
     if(!user) {
+
         return res.status(404).send({message: 'user is not found'})
     }
 
     try{
         const compare =  await bcrypt.compare(password , user.password)
+ 
         if (compare ){
-
+            
 
             const token = generateAuthToken(user.username, user.email)
 
@@ -166,7 +168,8 @@ const editUserDetails = async (req,res) => {
 
     const {error} = await editDetailSchema.validate(req.body);
 
-    if(error) return res.send({error})
+    if(error) return res.status(400).send({error})
+
 
     const { name,username, profileImage, bio } = req.body;
     const { id } = req.params;
